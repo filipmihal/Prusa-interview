@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react"
+import PrusaTable from "../components/PrusaTable"
 
-interface IPrinter {
+export interface IPrinter {
   id: number,
   title: string,
   buildVolume: string,
@@ -13,46 +14,13 @@ interface IPrinter {
   builtPrinter: boolean,
 }
 
-const keyValuePairs: {key: string, value: string}[] = [
-  {
-    key: "buildVolume",
-    value:  "Build volume"
-  },
-  {
-    key: "layerHeight",
-    value: "Layer height"
-  },
-  {
-    key: "maxTravelSpeed",
-    value: "Max travel speed"
-  },
-  {
-    key: "maxTemperatures", 
-    value: "Max temperatures"
-  },
-  {
-    key: "controller",
-    value: "Controller"
-  },
-  {
-    key: "filamentDiameter",
-    value: "Filament diameter"
-  },
-]
 
 function Table({data}: {data: IPrinter[]}) {
-  const [visibleParams, setVisibleParams] = useState(Array(keyValuePairs.length).fill(true))
   const [printers, setPrinters] = useState(data)
   const searchInput = useRef(null)
   const [requiredDiy, setRequiredDiy] = useState(false)
   const [requiredBuilt, setRequiredBuilt] = useState(false)
 
-
-  const createToggleParams = (index: number) => () => {
-    const newArray = [...visibleParams]
-    newArray[index] = !visibleParams[index]
-    setVisibleParams(newArray)
-  }
 
   const fetchSearchedPrinters = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -76,35 +44,10 @@ function Table({data}: {data: IPrinter[]}) {
       <input type="text" ref={searchInput}/>
       <input type="submit" value="search"/>
      </form>
-     <table>
-      <thead>
-        <tr>
-          <th></th>
-          {filteredPrinters.map(printer => (
-            <th key={printer.id}>{printer.title}</th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {keyValuePairs.map((pair, index) => (
-          visibleParams[index] && (
-            <tr key={pair.key}> 
-            <th>{pair.value} <p onClick={createToggleParams(index)}>ahoj</p></th>
-            {filteredPrinters.map(printer => (
-              <td key={printer.id}>{printer[pair.key]}</td>
-            ))}
-            </tr>
-          )
-        ))}
-      </tbody>
-     </table>
-     {keyValuePairs.map((pair, index) => (
-       !visibleParams[index] && 
-       <div onClick={createToggleParams(index)}>{pair.value}</div>
-     ))}
+     <PrusaTable printers={filteredPrinters}/>
      <div>
-       <input type="checkbox" checked={requiredDiy} onClick={() => setRequiredDiy(!requiredDiy)} /> DIY
-       <input type="checkbox" checked={requiredBuilt} onClick={() => setRequiredBuilt(!requiredBuilt)} /> Built
+       <input type="checkbox" checked={requiredDiy} onChange={() => setRequiredDiy(!requiredDiy)} /> DIY
+       <input type="checkbox" checked={requiredBuilt} onChange={() => setRequiredBuilt(!requiredBuilt)} /> Built
      </div>
    </div>
   )
