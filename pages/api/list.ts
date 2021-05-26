@@ -50,7 +50,7 @@ const PRINTERS = [
 ]
 
 function findPrintersByName(expression: string) {
-  return PRINTERS.filter(printer => printer.title.includes(expression))
+  return PRINTERS.filter(printer => printer.title.toUpperCase().includes(expression.toUpperCase()))
 }
 
 export default (req, res) => {

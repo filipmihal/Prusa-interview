@@ -1,3 +1,5 @@
+import React, { useRef, useState } from "react"
+
 interface IPrinter {
   id: number,
   title: string,
@@ -38,29 +40,72 @@ const keyValuePairs: {key: string, value: string}[] = [
   },
 ]
 
-function Home({data}: {data: IPrinter[]}) {
+function Table({data}: {data: IPrinter[]}) {
+  const [visibleParams, setVisibleParams] = useState(Array(keyValuePairs.length).fill(true))
+  const [printers, setPrinters] = useState(data)
+  const searchInput = useRef(null)
+  const [requiredDiy, setRequiredDiy] = useState(false)
+  const [requiredBuilt, setRequiredBuilt] = useState(false)
+
+
+  const createToggleParams = (index: number) => () => {
+    const newArray = [...visibleParams]
+    newArray[index] = !visibleParams[index]
+    setVisibleParams(newArray)
+  }
+
+  const fetchSearchedPrinters = async (e: React.FormEvent) => {
+    e.preventDefault()
+    console.log(searchInput.current.value)
+    const res = await fetch(`http://localhost:8000/api/list?search=${searchInput.current.value}`)
+    const {data} = await res.json()
+    setPrinters(data)
+  }
+
+  const getFilteredPrinters = () => {
+    return printers
+      .filter(printer => !requiredDiy || printer['diyKit'])
+      .filter(printer => !requiredBuilt || printer['builtPrinter'])
+  }
+
+  const filteredPrinters = getFilteredPrinters()
+
   return (
    <div>
+     <form onSubmit={fetchSearchedPrinters}>
+      <input type="text" ref={searchInput}/>
+      <input type="submit" value="search"/>
+     </form>
      <table>
       <thead>
         <tr>
           <th></th>
-          {data.map(printer => (
+          {filteredPrinters.map(printer => (
             <th key={printer.id}>{printer.title}</th>
           ))}
         </tr>
       </thead>
       <tbody>
-        {keyValuePairs.map(pair => (
-          <tr key={pair.key}> 
-            <th>{pair.value}</th>
-            {data.map(printer => (
+        {keyValuePairs.map((pair, index) => (
+          visibleParams[index] && (
+            <tr key={pair.key}> 
+            <th>{pair.value} <p onClick={createToggleParams(index)}>ahoj</p></th>
+            {filteredPrinters.map(printer => (
               <td key={printer.id}>{printer[pair.key]}</td>
             ))}
             </tr>
+          )
         ))}
       </tbody>
      </table>
+     {keyValuePairs.map((pair, index) => (
+       !visibleParams[index] && 
+       <div onClick={createToggleParams(index)}>{pair.value}</div>
+     ))}
+     <div>
+       <input type="checkbox" checked={requiredDiy} onClick={() => setRequiredDiy(!requiredDiy)} /> DIY
+       <input type="checkbox" checked={requiredBuilt} onClick={() => setRequiredBuilt(!requiredBuilt)} /> Built
+     </div>
    </div>
   )
 }
@@ -73,4 +118,4 @@ export async function getServerSideProps() {
   return { props: printers }
 }
 
-export default Home
+export default Table
