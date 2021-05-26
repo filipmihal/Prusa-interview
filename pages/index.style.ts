@@ -32,5 +32,8 @@ export const InputBtn = styled.input`
 `
 
 export const CheckDiv = styled.div`
-  margin-top: 15px;
+  margin-top: 20px;
+  span {
+    margin-right: 5px;
+  }
 `

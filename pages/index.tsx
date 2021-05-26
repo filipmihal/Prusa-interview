@@ -46,9 +46,9 @@ function Home({ data }: { data: IPrinter[] }) {
       <PrusaTable printers={filteredPrinters} />
       <CheckDiv>
         <input type="checkbox" checked={requiredDiy} onChange={() => setRequiredDiy(!requiredDiy)} />
-        <span>DIY</span>
+        <span>DIY Kit </span>
         <input type="checkbox" checked={requiredBuilt} onChange={() => setRequiredBuilt(!requiredBuilt)} />
-        <span>Built</span>
+        <span>Buill printer </span>
       </CheckDiv>
     </Layout>
   )
